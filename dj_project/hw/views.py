@@ -1,15 +1,38 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import ListView
 from django.contrib.auth import authenticate, login, logout
 from django import forms
 from . import models
 
 
-class BookingList(ListView):
+class BookingListView(ListView):
     model = models.Booking
     template_name = 'booking_list.html'
 
+    #def get(self, request, *args, **kwargs):
+        #traveler = models.Traveler.objects.get(user=request.user)
+        #return render(request, 'booking_list.html', {'traveler':traveler})
+        #return render(request, 'booking_list.html')
+    #    return object_
+
+
+    #def get_context_data(self, **kwargs):
+    #    context['o']
+    #    context['traveler'] = models.Traveler.objects.get(user=request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(BookingListView, self).get_context_data(**kwargs)
+        #context['latest_articles'] = Article.objects.all()[:5]
+        context['traveler'] = models.Traveler.objects.get(user=self.request.user)
+        return context
+
+    def get_queryset(self):
+        try:
+            qs = models.Booking.objects.filter(user=models.Traveler.objects.get(user=self.request.user))#.get()
+        except:
+            qs = None
+        return qs
 
 def authorization(request):
     if request.method == 'POST':
@@ -18,7 +41,9 @@ def authorization(request):
         if is_val:
             data = form.cleaned_data
             user = authenticate(request, username=data['username'], password=data['password'])
-            if user is None:
+            try:
+                models.Traveler.objects.get(user=user)
+            except:
                 form.add_error('username',['Логин или пароль введены неверно'])
                 is_val = False
 
@@ -79,6 +104,14 @@ class RegistrationForm(forms.Form):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/hw')
+
+
+def hotel_registration(request):
+    return HttpResponse("Такой странички пока нет")
+
+
+def trav_settings(request):
+    return HttpResponse("Такой странички пока нет")
 
 
 def index(request):

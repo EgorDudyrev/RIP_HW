@@ -7,7 +7,9 @@ class Traveler(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    photo = models.ImageField()
 
+    objects = models.Manager()
 
 class Hotel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -16,6 +18,7 @@ class Hotel(models.Model):
     description = models.CharField(max_length=255,null=True)
     photo = models.ImageField()
 
+
 class Booking(models.Model):
     user = models.ForeignKey(Traveler, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
@@ -23,4 +26,4 @@ class Booking(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
 
-
+    objects = models.Manager()

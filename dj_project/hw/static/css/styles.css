@@ -26,8 +26,11 @@ form h2 {
     text-align: center;
     margin-bottom: 30px;
 }
-.main-panel-elem, #side-panel {
+.main-panel-elem, .side-panel-elem {
     background-color: #ccc;
-    padding: 5px;
+    padding: 10px;
     border-radius: 5px;
+}
+.main-panel-elem h3, .side-panel-elem h3 {
+    margin-top: 2px;
 }

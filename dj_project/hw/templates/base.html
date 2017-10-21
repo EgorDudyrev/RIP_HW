@@ -44,17 +44,32 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <form class="navbar-form navbar-right">
-            {% if user.is_authenticated %}
-            <span>
+              {% if user.is_authenticated %}
+              <li class="dropdown">
+                  <button href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                      {{ traveler.first_name }}
+                      <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                      <li><a href="{% url 'trav_settings' %}">Настройки</a></li>
+                      <li><a href="{% url 'logout' %}">Выйти</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li><a href="{% url 'hotel_registration' %}">Регистрация отеля</a></li>
+              </ul>
+            </li>
+            <!--
+            <li class="dropdown">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{ user.username }}
                 <span class="caret"></span>
               </button>
-              <ul class="dropdown-menu">
-                <li><a href="#">Настройки</a></li>
-                <li><a href="{% url 'logout' %}">Выйти</a></li>
-              </ul>
-            </span>
+              <li class="dropdown">
+                  <ul><a class="dropdown-item" href="{% url 'trav_settings' %}">Настройки</a></ul>
+                  <ul><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></ul>
+                  <div class="dropdown-divider"></div>
+                  <ul><a class="dropdown-item" href="{% url 'hotel_registration' %}">Регистриция отеля</a></ul>
+              </li>
+            </li>-->
             {% else %}
               <a role="button" class="btn btn-default" href="{% url 'authorization' %}">Войти</a>
               <a role="button" class="btn btn-default" href="{% url 'registration' %}">Зарегестрироваться</a>
