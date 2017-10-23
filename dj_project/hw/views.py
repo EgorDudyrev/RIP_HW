@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import ListView
 from django.contrib.auth import authenticate, login, logout
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from . import models
 
 
@@ -10,26 +11,14 @@ class BookingListView(ListView):
     model = models.Booking
     template_name = 'booking_list.html'
 
-    #def get(self, request, *args, **kwargs):
-        #traveler = models.Traveler.objects.get(user=request.user)
-        #return render(request, 'booking_list.html', {'traveler':traveler})
-        #return render(request, 'booking_list.html')
-    #    return object_
-
-
-    #def get_context_data(self, **kwargs):
-    #    context['o']
-    #    context['traveler'] = models.Traveler.objects.get(user=request.user)
-
     def get_context_data(self, **kwargs):
         context = super(BookingListView, self).get_context_data(**kwargs)
-        #context['latest_articles'] = Article.objects.all()[:5]
         context['traveler'] = models.Traveler.objects.get(user=self.request.user)
         return context
 
     def get_queryset(self):
         try:
-            qs = models.Booking.objects.filter(user=models.Traveler.objects.get(user=self.request.user))#.get()
+            qs = models.Booking.objects.filter(user=models.Traveler.objects.get(user=self.request.user))
         except:
             qs = None
         return qs
@@ -65,13 +54,13 @@ def registration(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         is_val = form.is_valid()
+        print('validation: {}'.format(is_val))
+        # print('photo is: {}'.format(form.cleaned_data['photo']))
         if is_val:
             data = form.cleaned_data
             if data['password']!=data['password2']:
                 is_val = False
                 form.add_error('password2',['Пароли должны совпадать'])
-            #for user in models.User.objects:
-                #if data['username'] == user.username:
             if models.User.objects.filter(username=data['username']).exists():
                 form.add_error('username',['Пользователь с данным логином уже существует'])
                 is_val = False
@@ -84,6 +73,7 @@ def registration(request):
             trav.user = user
             trav.first_name = data['first_name']
             trav.last_name = data['last_name']
+            trav.photo = data['photo']
             trav.save()
             return HttpResponseRedirect('/hw/authorization')
     else:
@@ -99,6 +89,8 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField(label='Email')
     last_name = forms.CharField(label='Фамилия')
     first_name = forms.CharField(label='Имя')
+    photo = forms.FileField(label='Аватар', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}),required=False)
+
 
 
 def logout_view(request):

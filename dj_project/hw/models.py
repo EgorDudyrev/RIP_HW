@@ -7,7 +7,7 @@ class Traveler(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    photo = models.ImageField()
+    photo = models.ImageField(upload_to='trav_avats/', blank=True)
 
     objects = models.Manager()
 
