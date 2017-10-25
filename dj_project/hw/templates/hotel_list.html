@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block main_block %}
-<h2>Отели</h2>
+<h2>Выберите отели</h2>
 {% for obj in object_list %}
 <div class="main-panel-elem">
     <div class="row">
@@ -9,21 +9,18 @@
             {% load static  %}
             <img style="width:100px;" src="{% static 'img/hotel.jpg' %}">
         </div>
-        <div class="col-md-8">
+        <div class="col-md-10">
             <h3><a href="#">{{ obj.name }}</a></h3>
             <div style="">{{ obj.adress }}</div>
             Описание: {{ obj.description }}
-        </div>
-        <div class="col-md-2">
-            <div><a class="btn btn-default" href="#" role="button">Изменить</a></div>
-            <div><a class="btn btn-default" href="#" role="button">Удалить</a></div>
+            <div><a class="btn btn-primary" href="{% url 'booking' obj.name %}" role="button">Забронировать</a></div>
         </div>
     </div>
 
 </div>
 {% empty %}
 <div class="main-panel-elem">
-    На данный момент у вас нет отелей
+    Отелей для бронирования пока нет
 </div>
 {% endfor %}
 {% endblock %}

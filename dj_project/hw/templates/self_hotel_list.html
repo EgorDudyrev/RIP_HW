@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-asd
+
 {% block main_block %}
-<h2>Бронирования</h2>
+<h2>Отели</h2>
 {% for obj in object_list %}
 <div class="main-panel-elem">
     <div class="row">
@@ -9,17 +9,21 @@ asd
             {% load static  %}
             <img style="width:100px;" src="{% static 'img/hotel.jpg' %}">
         </div>
-        <div class="col-md-10">
-            <h3><a href="#">{{ obj.hotel.name }}</a></h3>
-            <div style="">{{ obj.hotel.adress }}</div>
-            <div>Цена: {{ obj.price }}</div>
-            <div>{{ obj.start_date }} - {{ obj.end_date }}</div>
+        <div class="col-md-8">
+            <h3><a href="#">{{ obj.name }}</a></h3>
+            <div style="">{{ obj.adress }}</div>
+            Описание: {{ obj.description }}
+        </div>
+        <div class="col-md-2">
+            <div><a class="btn btn-default" href="#" role="button">Изменить</a></div>
+            <div><a class="btn btn-default" href="#" role="button">Удалить</a></div>
         </div>
     </div>
+
 </div>
 {% empty %}
 <div class="main-panel-elem">
-    На данный момент вы ничего не забронировали
+    На данный момент у вас нет отелей
 </div>
 {% endfor %}
 {% endblock %}
@@ -30,7 +34,4 @@ asd
     <h3>{{ traveler.last_name }} {{ traveler.first_name }}</h3>
     {{ traveler.user.email }}
 </div>
-<!--<div class="side-panel-elem">-->
-<div><a class="btn btn-primary" href="{% url 'hotel_list' %}" role="button">Забронировать отель</a></div>
-<!--</div>-->
 {% endblock %}

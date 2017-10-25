@@ -24,12 +24,12 @@ class BookingListView(ListView):
         return qs
 
 
-class HotelListView(ListView):
+class SelfHotelListView(ListView):
     model = models.Hotel
-    template_name = 'hotel_list.html'
+    template_name = 'self_hotel_list.html'
 
     def get_context_data(self, **kwargs):
-        context = super(HotelListView, self).get_context_data(**kwargs)
+        context = super(SelfHotelListView, self).get_context_data(**kwargs)
         context['traveler'] = models.Traveler.objects.get(user=self.request.user)
         return context
 
@@ -43,6 +43,23 @@ class HotelListView(ListView):
             qs = None
         return qs
 
+
+class HotelListView(ListView):
+    model = models.Hotel
+    template_name = 'hotel_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HotelListView, self).get_context_data(**kwargs)
+        context['traveler'] = models.Traveler.objects.get(user=self.request.user)
+        return context
+
+    def get_queryset(self):
+        qs = super(HotelListView, self).get_queryset()
+        if qs is not None:
+            for q in qs:
+                if len(q.description)>50:
+                    q.description = q.description[:50]+'...'
+        return qs
 
 def authorization(request):
     if request.method == 'POST':
@@ -143,6 +160,48 @@ class HotelRegistrationForm(forms.Form):
     adress = forms.CharField(min_length=1, max_length=30, label='Адрес')
     description = forms.CharField(min_length=1, max_length=255, label='Описание')
     photo = forms.FileField(label='Фотография', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}), required=False)
+
+
+def booking(request,hotel):
+    traveler = models.Traveler.objects.get(user=request.user)
+    inits = {'user':'{} {}'.format(traveler.last_name,traveler.first_name),
+             'hotel':hotel,
+             'price':5000}
+
+
+
+    if request.method == "POST":
+        form = BookingForm(request.POST, initial=inits)
+        is_val = form.is_valid()
+        if is_val:
+            data = form.cleaned_data
+            if not str.isnumeric(data['price']):
+                form.add_error('price',['Цена указана некоректно'])
+                is_val = False
+            if data['start_date'] >= data['end_date']:
+                form.add_error('end_date',['Введённая дата отбытия предшествует дате прибытия'])
+                is_val = False
+        if is_val:
+            book = models.Booking()
+            book.user = traveler
+            book.hotel = models.Hotel.objects.get(name=data['hotel'])
+            book.price = int(data['price'])
+            book.start_date = data['start_date']
+            book.end_date = data['end_date']
+            book.save()
+            return HttpResponseRedirect('/hw')
+    else:
+        form = BookingForm(initial=inits)
+
+    return render(request, 'booking.html', {'form':form, 'traveler':traveler})
+
+
+class BookingForm(forms.Form):
+    user = forms.CharField(disabled=True,label='Постоялец')
+    hotel = forms.CharField(disabled=True, label='Отель')
+    price = forms.CharField(disabled=True,label='Стоимость')
+    start_date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата прибытия')
+    end_date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата отбытия')
 
 
 def logout_view(request):
