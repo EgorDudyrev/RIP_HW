@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib import admin
 
 
 class Traveler(models.Model):
@@ -11,12 +10,15 @@ class Traveler(models.Model):
 
     objects = models.Manager()
 
+
 class Hotel(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     adress = models.CharField(max_length=30)
     description = models.CharField(max_length=255,null=True)
-    photo = models.ImageField()
+    photo = models.ImageField(upload_to='hotel_avats/', blank=True)
+
+    objects = models.Manager()
 
 
 class Booking(models.Model):

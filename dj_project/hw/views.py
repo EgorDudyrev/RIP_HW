@@ -23,6 +23,27 @@ class BookingListView(ListView):
             qs = None
         return qs
 
+
+class HotelListView(ListView):
+    model = models.Hotel
+    template_name = 'hotel_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HotelListView, self).get_context_data(**kwargs)
+        context['traveler'] = models.Traveler.objects.get(user=self.request.user)
+        return context
+
+    def get_queryset(self):
+        try:
+            qs = models.Hotel.objects.filter(owner=self.request.user)
+            for q in qs:
+                if len(q.description)>50:
+                    q.description = q.description[:50]+'...'
+        except:
+            qs = None
+        return qs
+
+
 def authorization(request):
     if request.method == 'POST':
         form = AuthorizationForm(request.POST)
@@ -92,14 +113,41 @@ class RegistrationForm(forms.Form):
     photo = forms.FileField(label='Аватар', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}),required=False)
 
 
+def hotel_registration(request):
+    if request.method == 'POST':
+        form = HotelRegistrationForm(request.POST)
+        is_val = form.is_valid()
+        print('validation: {}'.format(is_val))
+        if is_val:
+            data = form.cleaned_data
+            if models.Hotel.objects.filter(name=data['name']).exists():
+                form.add_error('name',['Отель с таким названием уже зарегестрирован'])
+                is_val = False
+        if is_val:
+            hotel = models.Hotel()
+            hotel.owner = request.user
+            hotel.name = data['name']
+            hotel.adress = data['adress']
+            hotel.description = data['description']
+            hotel.save()
+            return HttpResponseRedirect('/hw/hotel_list')
+    else:
+        form = HotelRegistrationForm()
+
+    traveler = models.Traveler.objects.get(user=request.user)
+    return render(request, 'hotel_registration.html', {'form':form, 'traveler':traveler})
+
+
+class HotelRegistrationForm(forms.Form):
+    name = forms.CharField(min_length=5, max_length=30, label='Название')
+    adress = forms.CharField(min_length=1, max_length=30, label='Адрес')
+    description = forms.CharField(min_length=1, max_length=255, label='Описание')
+    photo = forms.FileField(label='Фотография', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}), required=False)
+
 
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/hw')
-
-
-def hotel_registration(request):
-    return HttpResponse("Такой странички пока нет")
 
 
 def trav_settings(request):

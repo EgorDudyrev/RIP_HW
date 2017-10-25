@@ -30,6 +30,7 @@ form h2 {
     background-color: #ccc;
     padding: 10px;
     border-radius: 5px;
+    margin-bottom: 10px;
 }
 .main-panel-elem h3, .side-panel-elem h3 {
     margin-top: 2px;
