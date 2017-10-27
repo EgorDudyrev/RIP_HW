@@ -10,7 +10,7 @@ asd
             <img style="width:100px;" src="{% static 'img/hotel.jpg' %}">
         </div>
         <div class="col-md-10">
-            <h3><a href="#">{{ obj.hotel.name }}</a></h3>
+            <h3><a href="{% url 'hotel_page' obj.hotel.name %}">{{ obj.hotel.name }}</a></h3>
             <div style="">{{ obj.hotel.adress }}</div>
             <div>Цена: {{ obj.price }}</div>
             <div>{{ obj.start_date }} - {{ obj.end_date }}</div>

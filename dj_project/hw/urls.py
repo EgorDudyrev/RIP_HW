@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^booking/(?P<hotel>[^/]+)', views.booking, name='booking'),
+    url(r'^hotels/(?P<hotel>[^/]+)', views.hotel_page, name='hotel_page'),
     url(r'^self_hotel_list', views.SelfHotelListView.as_view(), name='self_hotel_list'),
     url(r'^hotel_list', views.HotelListView.as_view(), name='hotel_list'),
     url(r'^hotel_registration', views.hotel_registration, name='hotel_registration'),

@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
-from django.views.generic import ListView
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
@@ -18,9 +18,12 @@ class BookingListView(ListView):
 
     def get_queryset(self):
         try:
-            qs = models.Booking.objects.filter(user=models.Traveler.objects.get(user=self.request.user))
+            trav = models.Traveler.objects.get(user=self.request.user)
+            qs = models.Booking.objects.filter(user=trav)
         except:
             qs = None
+        if qs is not None:
+            qs = qs.order_by('-start_date')
         return qs
 
 
@@ -60,6 +63,21 @@ class HotelListView(ListView):
                 if len(q.description)>50:
                     q.description = q.description[:50]+'...'
         return qs
+
+
+#class HotelPage(DetailView):
+#    model = models.Hotel
+#    template_name = 'hotel_page.html'
+
+
+def hotel_page(request, hotel):
+    try:
+        hotel = models.Hotel.objects.get(name=hotel)
+    except:
+        hotel = None
+
+    traveler = models.Traveler.objects.get(user=request.user)
+    return render(request, 'hotel_page.html', {'traveler':traveler, 'hotel':hotel})
 
 def authorization(request):
     if request.method == 'POST':
