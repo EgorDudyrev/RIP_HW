@@ -6,7 +6,7 @@ class Traveler(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    photo = models.ImageField(upload_to='trav_avats/', blank=True)
+    photo = models.ImageField(upload_to='trav_avats/', blank=True, default='trav_avats/default.png')
 
     objects = models.Manager()
 
@@ -16,7 +16,7 @@ class Hotel(models.Model):
     name = models.CharField(max_length=30)
     adress = models.CharField(max_length=30)
     description = models.CharField(max_length=255,null=True)
-    photo = models.ImageField(upload_to='hotel_avats/', blank=True)
+    photo = models.ImageField(upload_to='hotel_avats/', blank=True, default='hotel_avats/default.png')
 
     objects = models.Manager()
 

@@ -17,6 +17,18 @@ asd
         </div>
     </div>
 </div>
+{% if paginator.num_pages > 1 %}
+        {% if page_obj.has_previous %}
+            <a href="{% url 'book_list' page_obj.previous_page_numbe %}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="{% url 'book_list' page_obj.next_page_number %}">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        {% endif %}
+{% endif %}
 {% empty %}
 <div class="main-panel-elem">
     На данный момент вы ничего не забронировали
@@ -27,8 +39,7 @@ asd
 {% block side_block %}
 <h2>Пользователь:</h2>
 <div class="side-panel-elem">
-    <h3>{{ traveler.last_name }} {{ traveler.first_name }}</h3>
-    {{ traveler.user.email }}
+    {% include "traveler_info.html" %}
 </div>
 <!--<div class="side-panel-elem">-->
 <div><a class="btn btn-primary" href="{% url 'hotel_list' %}" role="button">Забронировать отель</a></div>

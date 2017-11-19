@@ -2,7 +2,7 @@
 
 {% block main_block %}
 <div class="main_block_elem">
-<form method="POST" class="form-horizontal main-panel-elem">
+<form method="POST" class="form-horizontal main-panel-elem" enctype="multipart/form-data" >
     <h2 style="text-align:center">Регистрация отеля</h2>
     {% csrf_token %}
     {% for field in form %}

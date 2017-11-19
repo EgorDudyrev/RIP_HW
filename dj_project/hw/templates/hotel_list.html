@@ -7,7 +7,8 @@
     <div class="row">
         <div class="col-md-2">
             {% load static  %}
-            <img style="width:100px;" src="{% static 'img/hotel.jpg' %}">
+            <!--<img style="width:100px;" src="{% static 'img/hotel.jpg' %}">-->
+            <img style="width:100px; height:100px;" src="{{ obj.photo.url }}">
         </div>
         <div class="col-md-10">
             <h3><a href="{% url 'hotel_page' obj.name %}">{{ obj.name }}</a></h3>
@@ -23,12 +24,23 @@
     Отелей для бронирования пока нет
 </div>
 {% endfor %}
+{% if paginator.num_pages > 1 %}
+        <!--{% if page_obj.has_previous %}
+            <a href="{% url 'hotel_list' page_obj.previous_page_number %}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+        {% endif %}
+        <!--{% if page_obj.has_next %}
+            <a href="{% url 'hotel_list' page_obj.next_page_numbe %}">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        {% endif %}-->
+{% endif %}
 {% endblock %}
 
 {% block side_block %}
 <h2>Пользователь:</h2>
 <div class="side-panel-elem">
-    <h3>{{ traveler.last_name }} {{ traveler.first_name }}</h3>
-    {{ traveler.user.email }}
+    {% include "traveler_info.html" %}
 </div>
 {% endblock %}

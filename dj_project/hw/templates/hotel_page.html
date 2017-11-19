@@ -7,11 +7,11 @@
         <h3>Такого отеля нет в базе данных</h3>
     {% else %}
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4" style="text-align: center;">
             {% load static  %}
-            <img style="width:100px;" src="{% static 'img/hotel.jpg' %}">
+            <img src="{{ hotel.photo.url }}" style="max-width: 200px;">
         </div>
-        <div class="col-md-10">
+        <div class="col-md-8">
             <div style=""><h4>Адрес:</h4>{{ hotel.adress }}</div>
             <div><h4>Описание:</h4> {{ hotel.description }}</div>
             <div><a class="btn btn-primary" href="{% url 'booking' hotel.name %}" role="button">Забронировать</a></div>
@@ -24,7 +24,6 @@
 {% block side_block %}
 <h2>Пользователь:</h2>
 <div class="side-panel-elem">
-    <h3>{{ traveler.last_name }} {{ traveler.first_name }}</h3>
-    {{ traveler.user.email }}
+    {% include "traveler_info.html" %}
 </div>
 {% endblock %}

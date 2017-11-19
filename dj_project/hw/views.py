@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import ListView, DetailView
@@ -5,11 +6,16 @@ from django.contrib.auth import authenticate, login, logout
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from . import models
+import logging
+
+
+logger = logging.getLogger('views')
 
 
 class BookingListView(ListView):
     model = models.Booking
     template_name = 'booking_list.html'
+    paginate_by = 1
 
     def get_context_data(self, **kwargs):
         context = super(BookingListView, self).get_context_data(**kwargs)
@@ -50,6 +56,7 @@ class SelfHotelListView(ListView):
 class HotelListView(ListView):
     model = models.Hotel
     template_name = 'hotel_list.html'
+    paginate_by = 2
 
     def get_context_data(self, **kwargs):
         context = super(HotelListView, self).get_context_data(**kwargs)
@@ -65,11 +72,7 @@ class HotelListView(ListView):
         return qs
 
 
-#class HotelPage(DetailView):
-#    model = models.Hotel
-#    template_name = 'hotel_page.html'
-
-
+@login_required(login_url='authorization')
 def hotel_page(request, hotel):
     try:
         hotel = models.Hotel.objects.get(name=hotel)
@@ -78,6 +81,7 @@ def hotel_page(request, hotel):
 
     traveler = models.Traveler.objects.get(user=request.user)
     return render(request, 'hotel_page.html', {'traveler':traveler, 'hotel':hotel})
+
 
 def authorization(request):
     if request.method == 'POST':
@@ -108,10 +112,9 @@ class AuthorizationForm(forms.Form):
 
 def registration(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+        form = RegistrationForm(request.POST, request.FILES)
         is_val = form.is_valid()
-        print('validation: {}'.format(is_val))
-        # print('photo is: {}'.format(form.cleaned_data['photo']))
+
         if is_val:
             data = form.cleaned_data
             if data['password']!=data['password2']:
@@ -123,14 +126,12 @@ def registration(request):
             if models.User.objects.filter(email=data['email']).exists():
                 form.add_error('email',['Пользователь с данной электронной почтой уже зарегестрирован'])
                 is_val = False
+
         if is_val:
-            user = models.User.objects.create_user(data['username'], data['email'], data['password'])
-            trav = models.Traveler()
-            trav.user = user
-            trav.first_name = data['first_name']
-            trav.last_name = data['last_name']
-            trav.photo = data['photo']
-            trav.save()
+            traveler = form.save(commit=False)
+            traveler.user = models.User.objects.create_user(data['username'], data['email'], data['password'])
+            traveler.save()
+
             return HttpResponseRedirect('/hw/authorization')
     else:
         form = RegistrationForm()
@@ -138,7 +139,7 @@ def registration(request):
     return render(request, 'registration.html',{'form':form})
 
 
-class RegistrationForm(forms.Form):
+class RegistrationForm(forms.ModelForm):
     username = forms.CharField(min_length=5,label='Логин')
     password = forms.CharField(min_length=8,widget=forms.PasswordInput, label='Пароль')
     password2 = forms.CharField(min_length=8, widget=forms.PasswordInput, label='Повторите ввод')
@@ -147,10 +148,14 @@ class RegistrationForm(forms.Form):
     first_name = forms.CharField(label='Имя')
     photo = forms.FileField(label='Аватар', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}),required=False)
 
+    class Meta:
+        model = models.Traveler
+        fields = ('username', 'password', 'password2', 'email', 'last_name', 'first_name', 'photo')
 
+@login_required(login_url='authorization')
 def hotel_registration(request):
     if request.method == 'POST':
-        form = HotelRegistrationForm(request.POST)
+        form = HotelRegistrationForm(request.POST, request.FILES)
         is_val = form.is_valid()
         print('validation: {}'.format(is_val))
         if is_val:
@@ -159,12 +164,10 @@ def hotel_registration(request):
                 form.add_error('name',['Отель с таким названием уже зарегестрирован'])
                 is_val = False
         if is_val:
-            hotel = models.Hotel()
+            hotel = form.save(commit=False)
             hotel.owner = request.user
-            hotel.name = data['name']
-            hotel.adress = data['adress']
-            hotel.description = data['description']
             hotel.save()
+
             return HttpResponseRedirect('/hw/hotel_list')
     else:
         form = HotelRegistrationForm()
@@ -173,21 +176,23 @@ def hotel_registration(request):
     return render(request, 'hotel_registration.html', {'form':form, 'traveler':traveler})
 
 
-class HotelRegistrationForm(forms.Form):
+class HotelRegistrationForm(forms.ModelForm):
     name = forms.CharField(min_length=5, max_length=30, label='Название')
     adress = forms.CharField(min_length=1, max_length=30, label='Адрес')
     description = forms.CharField(min_length=1, max_length=255, label='Описание')
-    photo = forms.FileField(label='Фотография', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}), required=False)
+    #photo = forms.FileField(label='Фотография', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}), required=False)
+    photo = forms.FileField(label='Фотография', required=False)
 
+    class Meta:
+        model = models.Hotel
+        fields = ('name', 'adress', 'description', 'photo')
 
+@login_required(login_url='authorization')
 def booking(request,hotel):
     traveler = models.Traveler.objects.get(user=request.user)
     inits = {'user':'{} {}'.format(traveler.last_name,traveler.first_name),
              'hotel':hotel,
              'price':5000}
-
-
-
     if request.method == "POST":
         form = BookingForm(request.POST, initial=inits)
         is_val = form.is_valid()
@@ -222,11 +227,13 @@ class BookingForm(forms.Form):
     end_date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата отбытия')
 
 
+@login_required(login_url='authorization')
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/hw')
 
 
+@login_required(login_url='authorization')
 def trav_settings(request):
     return HttpResponse("Такой странички пока нет")
 
@@ -235,4 +242,4 @@ def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('authorization')
     else:
-        return HttpResponseRedirect('book_list')
+        return HttpResponseRedirect('book_list/1')
