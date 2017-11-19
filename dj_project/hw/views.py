@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import ListView, DetailView
@@ -15,7 +16,7 @@ logger = logging.getLogger('views')
 class BookingListView(ListView):
     model = models.Booking
     template_name = 'booking_list.html'
-    paginate_by = 1
+    paginate_by = 2
 
     def get_context_data(self, **kwargs):
         context = super(BookingListView, self).get_context_data(**kwargs)
@@ -56,7 +57,7 @@ class SelfHotelListView(ListView):
 class HotelListView(ListView):
     model = models.Hotel
     template_name = 'hotel_list.html'
-    paginate_by = 2
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):
         context = super(HotelListView, self).get_context_data(**kwargs)

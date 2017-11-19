@@ -25,16 +25,16 @@
 </div>
 {% endfor %}
 {% if paginator.num_pages > 1 %}
-        <!--{% if page_obj.has_previous %}
-            <a href="{% url 'hotel_list' page_obj.previous_page_number %}">
+        {% if page_obj.has_previous %}
+            <a href="{% url 'hotel_list_page' page_obj.previous_page_number %}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
             </a>
         {% endif %}
-        <!--{% if page_obj.has_next %}
-            <a href="{% url 'hotel_list' page_obj.next_page_numbe %}">
+        {% if page_obj.has_next %}
+            <a href="{% url 'hotel_list_page' page_obj.next_page_number %}">
                 <span class="glyphicon glyphicon-chevron-right"></span>
             </a>
-        {% endif %}-->
+        {% endif %}
 {% endif %}
 {% endblock %}
 
