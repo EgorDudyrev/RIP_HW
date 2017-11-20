@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block main_block %}
+{% if not user.is_authenticated %}
 <div class="main_block_elem">
 <form method="POST" class="form-horizontal main-panel-elem">
     <h2 style="text-align:center">Регистрация пользователя</h2>
@@ -26,8 +27,15 @@
     </div>
 </form>
 </div>
+{% else %}
+<div class="main-panel-elem">
+    <h2>Выйдите из системы, чтобы иметь возможность зарегестрироваться</h2>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block side_block %}
-<h3>Зарегестрируйтесь в системе</h3>
+<div class="side-panel-elem">
+    <h3>Зарегестрируйтесь в системе</h3>
+</div>
 {% endblock %}

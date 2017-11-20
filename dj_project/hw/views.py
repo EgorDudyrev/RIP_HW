@@ -1,12 +1,11 @@
 from django.contrib.auth.decorators import login_required
-
+from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from . import models
+from .forms import *
 import logging
 
 
@@ -33,6 +32,9 @@ class BookingListView(ListView):
             qs = qs.order_by('-start_date')
         return qs
 
+    @method_decorator(login_required(login_url='authorization'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(BookingListView, self).dispatch(request, *args, **kwargs)
 
 class SelfHotelListView(ListView):
     model = models.Hotel
@@ -53,6 +55,9 @@ class SelfHotelListView(ListView):
             qs = None
         return qs
 
+    @method_decorator(login_required(login_url='authorization'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(SelfHotelListView, self).dispatch(request, *args, **kwargs)
 
 class HotelListView(ListView):
     model = models.Hotel
@@ -72,6 +77,9 @@ class HotelListView(ListView):
                     q.description = q.description[:50]+'...'
         return qs
 
+    @method_decorator(login_required(login_url='authorization'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(HotelListView, self).dispatch(request, *args, **kwargs)
 
 @login_required(login_url='authorization')
 def hotel_page(request, hotel):
@@ -87,6 +95,7 @@ def hotel_page(request, hotel):
 def authorization(request):
     if request.method == 'POST':
         form = AuthorizationForm(request.POST)
+
         is_val = form.is_valid()
         if is_val:
             data = form.cleaned_data
@@ -99,16 +108,17 @@ def authorization(request):
 
         if is_val:
             login(request, user)
-            return HttpResponseRedirect('/hw')
+            try:
+                return HttpResponseRedirect(request.GET['next'])
+            except:
+                return HttpResponseRedirect('/hw')
     else:
         form = AuthorizationForm()
 
-    return render(request, 'authorization.html',{'form':form})
-
-
-class AuthorizationForm(forms.Form):
-    username = forms.CharField(min_length=5, label='Логин')
-    password = forms.CharField(min_length=8,widget=forms.PasswordInput, label='Пароль')
+    context = {'form':form}
+    if request.user.is_authenticated():
+        context['traveler'] = models.Traveler.objects.get(user=request.user)
+    return render(request, 'authorization.html',context)
 
 
 def registration(request):
@@ -137,21 +147,11 @@ def registration(request):
     else:
         form = RegistrationForm()
 
-    return render(request, 'registration.html',{'form':form})
+    context = {'form':form}
+    if request.user.is_authenticated():
+        context['traveler'] = models.Traveler.objects.get(user=request.user)
+    return render(request, 'registration.html',context)
 
-
-class RegistrationForm(forms.ModelForm):
-    username = forms.CharField(min_length=5,label='Логин')
-    password = forms.CharField(min_length=8,widget=forms.PasswordInput, label='Пароль')
-    password2 = forms.CharField(min_length=8, widget=forms.PasswordInput, label='Повторите ввод')
-    email = forms.EmailField(label='Email')
-    last_name = forms.CharField(label='Фамилия')
-    first_name = forms.CharField(label='Имя')
-    photo = forms.FileField(label='Аватар', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}),required=False)
-
-    class Meta:
-        model = models.Traveler
-        fields = ('username', 'password', 'password2', 'email', 'last_name', 'first_name', 'photo')
 
 @login_required(login_url='authorization')
 def hotel_registration(request):
@@ -176,17 +176,6 @@ def hotel_registration(request):
     traveler = models.Traveler.objects.get(user=request.user)
     return render(request, 'hotel_registration.html', {'form':form, 'traveler':traveler})
 
-
-class HotelRegistrationForm(forms.ModelForm):
-    name = forms.CharField(min_length=5, max_length=30, label='Название')
-    adress = forms.CharField(min_length=1, max_length=30, label='Адрес')
-    description = forms.CharField(min_length=1, max_length=255, label='Описание')
-    #photo = forms.FileField(label='Фотография', widget=forms.ClearableFileInput(attrs={'class':'ask-signup-avatar-input'}), required=False)
-    photo = forms.FileField(label='Фотография', required=False)
-
-    class Meta:
-        model = models.Hotel
-        fields = ('name', 'adress', 'description', 'photo')
 
 @login_required(login_url='authorization')
 def booking(request,hotel):
@@ -218,14 +207,6 @@ def booking(request,hotel):
         form = BookingForm(initial=inits)
 
     return render(request, 'booking.html', {'form':form, 'traveler':traveler})
-
-
-class BookingForm(forms.Form):
-    user = forms.CharField(disabled=True,label='Постоялец')
-    hotel = forms.CharField(disabled=True, label='Отель')
-    price = forms.CharField(disabled=True,label='Стоимость')
-    start_date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата прибытия')
-    end_date = forms.DateField(widget=forms.SelectDateWidget(), label='Дата отбытия')
 
 
 @login_required(login_url='authorization')
