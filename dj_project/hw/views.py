@@ -15,7 +15,7 @@ logger = logging.getLogger('views')
 class BookingListView(ListView):
     model = models.Booking
     template_name = 'booking_list.html'
-    paginate_by = 2
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):
         context = super(BookingListView, self).get_context_data(**kwargs)
@@ -83,13 +83,18 @@ class HotelListView(ListView):
 
 @login_required(login_url='authorization')
 def hotel_page(request, hotel):
+    context = {}
     try:
-        hotel = models.Hotel.objects.get(name=hotel)
+        context['hotel']= models.Hotel.objects.get(name=hotel)
+        context['features'] = context['hotel'].features.all()
+        if len(context['features'])==0:
+            context['features']=None
     except:
-        hotel = None
+        context['hotel'] = None
 
-    traveler = models.Traveler.objects.get(user=request.user)
-    return render(request, 'hotel_page.html', {'traveler':traveler, 'hotel':hotel})
+
+    context['traveler'] = models.Traveler.objects.get(user=request.user)
+    return render(request, 'hotel_page.html', context)
 
 
 def authorization(request):
@@ -168,7 +173,7 @@ def hotel_registration(request):
             hotel = form.save(commit=False)
             hotel.owner = request.user
             hotel.save()
-
+            form.save_m2m()
             return HttpResponseRedirect('/hw/hotel_list')
     else:
         form = HotelRegistrationForm()

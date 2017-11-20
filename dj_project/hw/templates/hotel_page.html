@@ -13,8 +13,16 @@
         </div>
         <div class="col-md-8">
             <div style=""><h4>Адрес:</h4>{{ hotel.adress }}</div>
+            {% if features is not None %}
+            <div style=""><h4>Особенности:</h4></div>
+            {% for feature in features %}
+            <span class="label label-default" style="margin-right:5px;">
+                {{ feature }}
+            </span>
+            {% endfor %}
+            {% endif %}
             <div><h4>Описание:</h4> {{ hotel.description }}</div>
-            <div><a class="btn btn-primary" href="{% url 'booking' hotel.name %}" role="button">Забронировать</a></div>
+            <div><a class="btn btn-primary" href="{% url 'booking' hotel.name %}" role="button" style="margin-top: 10px;">Забронировать</a></div>
         </div>
     </div>
     {% endif %}

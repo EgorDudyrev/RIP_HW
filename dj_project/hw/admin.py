@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Traveler, Hotel, Booking
+from .models import Traveler, Hotel, Booking, HotelFeature
 
 # Register your models here.
 @admin.register(Traveler)
@@ -17,12 +17,10 @@ class TravelerAdmin(admin.ModelAdmin):
         hs = Booking.objects.filter(user=obj)
         return len(hs)>0
 
+
 @admin.register(Hotel)
 class HotelAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner',  'adress', 'description')
-
-    def owner(self, obj):
-        return "{}".format(obj.owner.username)
 
 
 @admin.register(Booking)
@@ -30,7 +28,12 @@ class BookingAdmin(admin.ModelAdmin):
     list_display = ('username', 'hotelname', 'price', 'start_date', 'end_date')
 
     def username(self, obj):
-        return "{}".format(obj.user.user.username)
+        return "{} ({} {})".format(obj.user.user.username, obj.user.last_name, obj.user.first_name)
 
     def hotelname(self, obj):
         return "{}".format(obj.hotel.name)
+
+
+@admin.register(HotelFeature)
+class HotelFeatureAdmin(admin.ModelAdmin):
+    list_display = ('title',)

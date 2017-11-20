@@ -1,9 +1,11 @@
 from django import forms
 from . import models
 
+
 class AuthorizationForm(forms.Form):
     username = forms.CharField(min_length=5, label='Логин')
     password = forms.CharField(min_length=8,widget=forms.PasswordInput, label='Пароль')
+
 
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField(min_length=5,label='Логин')
@@ -18,15 +20,18 @@ class RegistrationForm(forms.ModelForm):
         model = models.Traveler
         fields = ('username', 'password', 'password2', 'email', 'last_name', 'first_name', 'photo')
 
+
 class HotelRegistrationForm(forms.ModelForm):
     name = forms.CharField(min_length=5, max_length=30, label='Название')
     adress = forms.CharField(min_length=1, max_length=30, label='Адрес')
     description = forms.CharField(min_length=1, max_length=255, label='Описание')
     photo = forms.FileField(label='Фотография', required=False)
 
+
     class Meta:
         model = models.Hotel
-        fields = ('name', 'adress', 'description', 'photo')
+        fields = ('name', 'adress', 'description', 'photo', 'features')
+
 
 class BookingForm(forms.Form):
     user = forms.CharField(disabled=True,label='Постоялец')
