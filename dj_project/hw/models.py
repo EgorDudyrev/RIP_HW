@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils.timezone import now
 
 class Traveler(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
@@ -14,7 +14,7 @@ class Traveler(models.Model):
         ordering = ('last_name','first_name',)
 
     def __str__(self):
-        return "{}: {} {} ".format(self.user.username, self.last_name, self.first_name)
+        return "{}".format(self.user.username)#, self.last_name, self.first_name)
 
 
 class HotelFeature(models.Model):
@@ -42,8 +42,8 @@ class Hotel(models.Model):
     class Meta:
         ordering = ('name',)
 
-    def __str__(self):
-        return "{}".format(self.name)
+  #  def __str__(self):
+   #     return "{}".format(self.name)
 
 
 class Booking(models.Model):
@@ -52,14 +52,15 @@ class Booking(models.Model):
     price = models.IntegerField(verbose_name='Стоимость')
     start_date = models.DateField(verbose_name='Дата заезда')
     end_date = models.DateField(verbose_name='Дата отъезда')
+    booking_date = models.DateTimeField(default=now, blank=False,verbose_name='Дата бронирования')
 
     objects = models.Manager()
 
     class Meta:
         ordering = ('-start_date',)
 
-#    def __str__(self):
-#        return "{} - {}: {} {}".format(self.user.user.username, self.hotel.name, self.start_date, self.end_date)
+    def __str__(self):
+        return "{}: {} {}".format(self.user.user.username, self.start_date, self.end_date)
 
 
 

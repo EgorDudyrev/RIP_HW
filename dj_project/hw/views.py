@@ -260,12 +260,12 @@ def ajax_book(request):
 def ajax_last_bookings(request):
     hotel = models.Hotel.objects.get(name=request.GET['hotel_name'])
     traveler = models.Traveler.objects.get(user=models.User.objects.get(email=request.GET['user_email']))
-    bookings = models.Booking.objects.filter(hotel=hotel, user=traveler).order_by('-start_date','-end_date').all()[:5]
+    bookings = models.Booking.objects.filter(hotel=hotel, user=traveler).order_by('-booking_date').all()[:5]
     if len(bookings) == 0:
         return HttpResponse('-')
 
-    response = "<thead><tr><th>Прибытие</th><th>Отбытие</th><th>Стоимость</th></tr></thead>"
+    response = "<thead><tr><th>Забронировано</th><th>Прибытие</th><th>Отбытие</th><th>Стоимость</th></tr></thead>"
     for b in bookings:
-        response += "<tr><td>{}</td><td>{}</td><td>{}</td></tr>".format(b.start_date, b.end_date, b.price)
+        response += "<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>".format(b.booking_date.date(),b.start_date, b.end_date, b.price)
 
     return HttpResponse(response)
