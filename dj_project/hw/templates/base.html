@@ -51,13 +51,14 @@
                       <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu">
-                      <li><a href="{% url 'trav_settings' %}">Настройки</a></li>
+                      <!--<li><a href="{% url 'trav_settings' %}">Настройки</a></li>-->
+                      <li><a href="#">Настройки</a></li>
                       <li><a href="{% url 'logout' %}">Выйти</a></li>
                       <li role="separator" class="divider"></li>
                       <li><a href="{% url 'hotel_registration' %}">Регистрация отеля</a></li>
-                      <li><a href="{% url 'self_hotel_list' %}">Отели</a></li>
-              </ul>
-            </li>
+                      <li><a href="{% url 'self_hotel_list' %}">Мои отели</a></li>
+                  </ul>
+              </li>
             <!--
             <li class="dropdown">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -99,5 +100,6 @@
     <script src="{% static 'js/bootstrap.min.js'%}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{% static 'js/ie10-viewport-bug-workaround.js'%}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
   </body>
 </html>

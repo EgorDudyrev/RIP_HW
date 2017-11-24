@@ -1,12 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
 from django.views.generic import ListView, DetailView
 from django.contrib.auth import authenticate, login, logout
 from . import models
 from .forms import *
 import logging
+import datetime
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+
 
 
 logger = logging.getLogger('views')
@@ -67,6 +71,7 @@ class HotelListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(HotelListView, self).get_context_data(**kwargs)
         context['traveler'] = models.Traveler.objects.get(user=self.request.user)
+        #context['booking_form'] = BookingForm()
         return context
 
     def get_queryset(self):
@@ -81,17 +86,18 @@ class HotelListView(ListView):
     def dispatch(self, request, *args, **kwargs):
         return super(HotelListView, self).dispatch(request, *args, **kwargs)
 
+
 @login_required(login_url='authorization')
 def hotel_page(request, hotel):
     context = {}
     try:
-        context['hotel']= models.Hotel.objects.get(name=hotel)
+        context['hotel'] = models.Hotel.objects.get(name=hotel)
         context['features'] = context['hotel'].features.all()
-        if len(context['features'])==0:
-            context['features']=None
+        context['booking_form'] = BookingForm()
+        if len(context['features']) == 0:
+            context['features'] = None
     except:
         context['hotel'] = None
-
 
     context['traveler'] = models.Traveler.objects.get(user=request.user)
     return render(request, 'hotel_page.html', context)
@@ -230,3 +236,36 @@ def index(request):
         return HttpResponseRedirect('authorization')
     else:
         return HttpResponseRedirect('book_list/1')
+
+
+def ajax_book(request):
+    if request.method == "POST":
+        hotel = models.Hotel.objects.get(name=request.POST['hotel_name'])
+        traveler = models.Traveler.objects.get(user=models.User.objects.get(email=request.POST['user_email']))
+        start_date = datetime.date(int(request.POST['start_year']),int(request.POST['start_month']),int(request.POST['start_day']))
+        end_date = datetime.date(int(request.POST['end_year']),int(request.POST['end_month']),int(request.POST['end_day']))
+        price = int(request.POST['price'])
+
+        book = models.Booking()
+        book.user = traveler
+        book.hotel = hotel
+        book.price = price
+        book.start_date = start_date
+        book.end_date = end_date
+        book.save()
+        return HttpResponse('success')
+        #return HttpResponse(datetime.(request.POST['start_date']))
+        #return HttpResponse(forms.DateField(request.POST['start_date']))
+
+def ajax_last_bookings(request):
+    hotel = models.Hotel.objects.get(name=request.GET['hotel_name'])
+    traveler = models.Traveler.objects.get(user=models.User.objects.get(email=request.GET['user_email']))
+    bookings = models.Booking.objects.filter(hotel=hotel, user=traveler).order_by('-start_date','-end_date').all()[:5]
+    if len(bookings) == 0:
+        return HttpResponse('-')
+
+    response = ""
+    for b in bookings:
+        response += "<li>{} - {}, стоимость: {}</li>".format(b.start_date, b.end_date, b.price)
+
+    return HttpResponse(response)

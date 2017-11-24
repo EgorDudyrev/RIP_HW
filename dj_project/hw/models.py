@@ -13,6 +13,9 @@ class Traveler(models.Model):
     class Meta:
         ordering = ('last_name','first_name',)
 
+    def __str__(self):
+        return "{}: {} {} ".format(self.user.username, self.last_name, self.first_name)
+
 
 class HotelFeature(models.Model):
     title = models.CharField(max_length=30, verbose_name='Название')
@@ -54,6 +57,9 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ('-start_date',)
+
+#    def __str__(self):
+#        return "{} - {}: {} {}".format(self.user.user.username, self.hotel.name, self.start_date, self.end_date)
 
 
 

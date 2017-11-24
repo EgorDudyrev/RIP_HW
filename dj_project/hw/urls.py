@@ -19,6 +19,12 @@ urlpatterns = [
     url(r'^book_list/(?P<page>\d+)/$', views.BookingListView.as_view(), name='book_list_page'),
     url(r'^$', views.index, name='index')
 ]
+ajax_functions = [
+    url(r'^ajax/book/', views.ajax_book, name='ajax_book'),
+    url(r'^ajax/last_bookings/', views.ajax_last_bookings, name='ajax_last_bookings'),
+]
+
+urlpatterns += ajax_functions
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
