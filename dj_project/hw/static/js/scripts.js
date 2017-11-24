@@ -15,6 +15,7 @@ function calc_price(){
     }
     else{
         $("#id_price").val(diff_days*1000);
+        //document.getElementsById('id_price').value = diff*1000;
         $("#date_errors").hide();
         console.log('diff',diff_days);
     }
@@ -108,10 +109,12 @@ $(document).ready(function(){
         })
     })
 
-    $("#id_start_date_month").change(calc_price);
-    $("#id_start_date_day").change(calc_price);
-    $("#id_start_date_year").change(calc_price);
-    $("#id_end_date_month").change(calc_price);
-    $("#id_end_date_day").change(calc_price);
-    $("#id_end_date_year").change(calc_price);
+    if(document.URL.match('hw/hotels')){
+        $("#id_start_date_month").change(calc_price);
+        $("#id_start_date_day").change(calc_price);
+        $("#id_start_date_year").change(calc_price);
+        $("#id_end_date_month").change(calc_price);
+        $("#id_end_date_day").change(calc_price);
+        $("#id_end_date_year").change(calc_price);
+    };
 });
