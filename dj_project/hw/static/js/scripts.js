@@ -54,7 +54,13 @@ $(document).ready(function(){
     console.log('Document is ready');
 
     if(document.URL.match('hw/hotels')){
-        load_last_bookings()
+        load_last_bookings();
+        $("#id_start_date_month").change(calc_price);
+        $("#id_start_date_day").change(calc_price);
+        $("#id_start_date_year").change(calc_price);
+        $("#id_end_date_month").change(calc_price);
+        $("#id_end_date_day").change(calc_price);
+        $("#id_end_date_year").change(calc_price);
     }
 
     //при нажатию на любую кнопку, имеющую класс .btn_modal_booking
@@ -108,13 +114,4 @@ $(document).ready(function(){
             },
         })
     })
-
-    if(document.URL.match('hw/hotels')){
-        $("#id_start_date_month").change(calc_price);
-        $("#id_start_date_day").change(calc_price);
-        $("#id_start_date_year").change(calc_price);
-        $("#id_end_date_month").change(calc_price);
-        $("#id_end_date_day").change(calc_price);
-        $("#id_end_date_year").change(calc_price);
-    };
 });

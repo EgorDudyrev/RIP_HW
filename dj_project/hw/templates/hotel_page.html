@@ -24,7 +24,7 @@
             {% endif %}
             <div><h4>Описание:</h4> {{ hotel.description }}</div>
             <div><h4 id="last_bookings_header" hidden="True">Ваши последние бронирования:</h4></div>
-            <ul id="last_bookings" onload="load_last_bookings()" ></ul>
+            <table class="table" id="last_bookings" onload="load_last_bookings()"></table>
             <!--<div><a class="btn btn-primary" href="{% url 'booking' hotel.name %}" role="button" style="margin-top: 10px;">Забронировать</a></div>-->
             <div><a href="#" class="btn btn-primary btn_modal_booking" style="margin-top: 10px;">Забронировать</a></div>
 

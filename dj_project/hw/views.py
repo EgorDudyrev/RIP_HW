@@ -264,8 +264,8 @@ def ajax_last_bookings(request):
     if len(bookings) == 0:
         return HttpResponse('-')
 
-    response = ""
+    response = "<thead><tr><th>Прибытие</th><th>Отбытие</th><th>Стоимость</th></tr></thead>"
     for b in bookings:
-        response += "<li>{} - {}, стоимость: {}</li>".format(b.start_date, b.end_date, b.price)
+        response += "<tr><td>{}</td><td>{}</td><td>{}</td></tr>".format(b.start_date, b.end_date, b.price)
 
     return HttpResponse(response)
